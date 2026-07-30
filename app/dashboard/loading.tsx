@@ -1,0 +1,1 @@
+export default function DashboardLoading(){return <div className="mx-auto max-w-6xl animate-pulse space-y-5"><div className="h-64 rounded-3xl bg-blue-100"/><div className="grid gap-4 md:grid-cols-3"><div className="h-36 rounded-3xl bg-white"/><div className="h-36 rounded-3xl bg-white"/><div className="h-36 rounded-3xl bg-white"/></div></div>}
