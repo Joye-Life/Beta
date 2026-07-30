@@ -166,7 +166,7 @@ export default async function MoneyPage({ searchParams }: { searchParams: Promis
 
     <div className="mt-6 grid gap-6 xl:grid-cols-[1.25fr_.75fr]">
       <div className="space-y-6">
-        <form action={saveIncome} className="card border-blue-100 p-6">
+        <form action={saveIncome} className="card border-joye-100 p-6">
           <p className="eyebrow">Income</p><h2 className="mt-2 text-2xl font-semibold">Tell Joye how you get paid</h2><p className="mt-2 text-sm leading-6 text-black/55">This helps Joye estimate how much to reserve from each paycheck.</p>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             <Field label="Gross monthly income"><input className="input" type="number" step="0.01" min="0" name="gross_monthly_income" defaultValue={income?.gross_monthly_income || 0} /></Field>
@@ -192,7 +192,7 @@ export default async function MoneyPage({ searchParams }: { searchParams: Promis
         })()}
 
         <div className="grid gap-6 lg:grid-cols-2">
-          <form action={addBill} className="card border-blue-100 p-6">
+          <form action={addBill} className="card border-joye-100 p-6">
             <p className="eyebrow">Regular bills</p><h2 className="mt-2 text-xl font-semibold">Add a bill you pay regularly</h2><p className="mt-2 text-sm leading-6 text-black/55">Examples include rent, phone, insurance, subscriptions, and utilities.</p>
             <div className="mt-5 grid gap-4">
               <Field label="Bill name"><input className="input" name="name" required placeholder="Rent, phone, insurance" /></Field>
@@ -202,7 +202,7 @@ export default async function MoneyPage({ searchParams }: { searchParams: Promis
             </div><SubmitButton className="button-primary mt-5" pendingText="Adding bill...">Add bill</SubmitButton>
           </form>
 
-          <form action={addDebt} className="card border-blue-100 p-6">
+          <form action={addDebt} className="card border-joye-100 p-6">
             <p className="eyebrow">Debt</p><h2 className="mt-2 text-xl font-semibold">Add a debt you are paying off</h2><p className="mt-2 text-sm leading-6 text-black/55">Add credit cards, loans, or other balances so Joye can help prioritize them.</p>
             <div className="mt-5 grid gap-4">
               <Field label="Account name"><input className="input" name="name" required placeholder="Visa, student loan, car" /></Field>
@@ -223,16 +223,16 @@ export default async function MoneyPage({ searchParams }: { searchParams: Promis
 
         <ListCard title="Regular bills" empty="No regular bills added yet.">{(bills || []).map((bill) => { const due = nextOccurrence(bill.due_date, bill.frequency, today); const paid = due ? paidKeys.has(`bill:${bill.id}:${dateISO(due)}`) : false; return <Item key={bill.id} title={bill.name} value={money(Number(bill.amount))} detail={`${formatDueDate(bill.due_date, bill.due_day)} · ${friendlyFrequency(bill.frequency)}${bill.autopay ? " · autopay" : ""}`} id={bill.id} table="recurring_bills" payment={due ? { sourceType: "bill", dueDate: dateISO(due), amount: Number(bill.amount), name: bill.name, paid } : undefined} />; })}</ListCard>
         <ListCard title="Debts" empty="No debts added yet.">{(debts || []).map((debt) => { const due = nextOccurrence(debt.due_date, "monthly", today); const paid = due ? paidKeys.has(`debt:${debt.id}:${dateISO(due)}`) : false; return <Item key={debt.id} title={debt.name} value={money(Number(debt.balance))} detail={`${money(Number(debt.minimum_payment))} minimum payment · ${Number(debt.interest_rate || 0).toFixed(2)}% APR${debt.due_date ? ` · due ${new Date(`${debt.due_date}T12:00:00`).toLocaleDateString()}` : ""}`} id={debt.id} table="debts" payment={due ? { sourceType: "debt", dueDate: dateISO(due), amount: Number(debt.minimum_payment), name: `${debt.name} minimum`, paid } : undefined} />; })}</ListCard>
-        <ListCard title="Paid recently" empty="No payments marked paid yet.">{(payments || []).slice(0,6).map((payment) => <div key={payment.id} className="rounded-2xl border border-green-100 bg-green-50/50 p-4"><div className="flex items-start justify-between gap-3"><div><p className="font-semibold">{payment.name}</p><p className="mt-1 text-xs text-black/45">{money(Number(payment.amount))} · paid {new Date(payment.paid_at).toLocaleDateString()}</p></div><form action={undoPaid}><input type="hidden" name="payment_id" value={payment.id}/><button className="text-xs font-semibold text-blue-700">Undo</button></form></div></div>)}</ListCard>
+        <ListCard title="Paid recently" empty="No payments marked paid yet.">{(payments || []).slice(0,6).map((payment) => <div key={payment.id} className="rounded-2xl border border-green-100 bg-green-50/50 p-4"><div className="flex items-start justify-between gap-3"><div><p className="font-semibold">{payment.name}</p><p className="mt-1 text-xs text-black/45">{money(Number(payment.amount))} · paid {new Date(payment.paid_at).toLocaleDateString()}</p></div><form action={undoPaid}><input type="hidden" name="payment_id" value={payment.id}/><button className="text-xs font-semibold text-joye-700">Undo</button></form></div></div>)}</ListCard>
         <ListCard title="Recent paycheck plans" empty="No paycheck plans saved yet.">{(plans || []).map((plan) => { const allocated = Array.isArray(plan.allocations) ? plan.allocations.reduce((sum: number, row: { amount?: number }) => sum + Number(row.amount || 0), 0) : 0; return <Item key={plan.id} title={new Date(`${plan.paycheck_date}T12:00:00`).toLocaleDateString()} value={money(Number(plan.paycheck_amount))} detail={`${money(allocated)} allocated · ${money(Number(plan.paycheck_amount)-allocated)} remaining`} id={plan.id} table="paycheck_plans" />; })}</ListCard>
       </div>
     </div>
   </section>;
 }
 
-function Metric({ label, value, detail }: { label: string; value: string; detail: string }) { return <div className="card border-blue-100 p-5"><p className="text-sm text-black/45">{label}</p><p className="mt-2 text-3xl font-semibold">{value}</p><p className="mt-2 text-xs leading-5 text-black/45">{detail}</p></div>; }
+function Metric({ label, value, detail }: { label: string; value: string; detail: string }) { return <div className="card border-joye-100 p-5"><p className="text-sm text-black/45">{label}</p><p className="mt-2 text-3xl font-semibold">{value}</p><p className="mt-2 text-xs leading-5 text-black/45">{detail}</p></div>; }
 function Field({ label, children }: { label: string; children: React.ReactNode }) { return <div><label className="label">{label}</label>{children}</div>; }
-function ListCard({ title, empty, children }: { title: string; empty: string; children: React.ReactNode }) { const list = Array.isArray(children) ? children : [children]; return <div className="card border-blue-100 p-6"><h2 className="text-xl font-semibold">{title}</h2><div className="mt-4 space-y-3">{list.filter(Boolean).length ? children : <p className="text-sm text-black/45">{empty}</p>}</div></div>; }
+function ListCard({ title, empty, children }: { title: string; empty: string; children: React.ReactNode }) { const list = Array.isArray(children) ? children : [children]; return <div className="card border-joye-100 p-6"><h2 className="text-xl font-semibold">{title}</h2><div className="mt-4 space-y-3">{list.filter(Boolean).length ? children : <p className="text-sm text-black/45">{empty}</p>}</div></div>; }
 function Item({ title, value, detail, id, table, payment }: { title: string; value: string; detail: string; id: string; table: string; payment?: { sourceType: "bill" | "debt"; dueDate: string; amount: number; name: string; paid: boolean } }) {
   return <div className="rounded-2xl border border-black/8 p-4"><div className="flex items-start justify-between gap-3"><div><p className="font-semibold">{title}</p><p className="mt-1 text-xs text-black/45">{detail}</p>{payment ? <form action={markPaid} className="mt-3"><input type="hidden" name="source_type" value={payment.sourceType}/><input type="hidden" name="source_id" value={id}/><input type="hidden" name="name" value={payment.name}/><input type="hidden" name="amount" value={payment.amount}/><input type="hidden" name="due_date" value={payment.dueDate}/><SubmitButton className={payment.paid ? "rounded-xl bg-green-50 px-3 py-2 text-xs font-semibold text-green-700" : "button-secondary text-xs"} pendingText="Saving...">{payment.paid ? "Paid" : "Mark next payment paid"}</SubmitButton></form> : null}</div><div className="text-right"><p className="font-semibold">{value}</p><form action={deleteItem} className="mt-2"><input type="hidden" name="id" value={id} /><input type="hidden" name="table" value={table} /><button className="text-xs text-red-600">Remove</button></form></div></div></div>;
 }

@@ -115,7 +115,7 @@ export function inferCoachIntent(section: CoachSection, question: string, priorU
 
   const compactFollowUp = words(question).length <= 7 || /\b(it|that|those|this|weekends?|instead|also)\b/i.test(question);
   if (compactFollowUp) {
-    for (const previous of [...priorUserMessages].reverse().slice(0, 3)) {
+    for (const previous of [...priorUserMessages].reverse().slice(0, 6)) {
       const inherited = detectIntent(previous);
       if (inherited !== "unknown") return inherited;
     }
@@ -127,6 +127,105 @@ export function inferCoachIntent(section: CoachSection, question: string, priorU
   if (section === "weekly") return "weekly";
   if (section === "today") return "focus";
   return "unknown";
+}
+
+const NUMBER_WORDS: Record<string, number> = {
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+  five: 5,
+  six: 6,
+  seven: 7,
+  eight: 8,
+  nine: 9,
+  ten: 10,
+  twelve: 12,
+};
+
+const NUMBER_TOKEN = "(?:\\d+|one|two|three|four|five|six|seven|eight|nine|ten|twelve)";
+
+function numberValue(value: string | undefined) {
+  if (!value) return null;
+  const normalized = value.toLowerCase();
+  if (/^\d+$/.test(normalized)) return Number.parseInt(normalized, 10);
+  return NUMBER_WORDS[normalized] ?? null;
+}
+
+function countNear(value: string, nouns: string) {
+  const match = value.toLowerCase().match(new RegExp(`\\b(${NUMBER_TOKEN})\\s+(?:${nouns})\\b`, "i"));
+  return numberValue(match?.[1]);
+}
+
+function conversationText(question: string, priorUserMessages: string[]) {
+  return [...priorUserMessages.slice(-6), question].join(" ").toLowerCase();
+}
+
+function priorHasIntent(priorUserMessages: string[], intent: CoachIntent) {
+  return priorUserMessages.slice(-6).some((message) => detectIntent(message) === intent);
+}
+
+function parsePeople(value: string) {
+  const normalized = value.toLowerCase();
+  if (/\b(?:both of us|two of us|me and my partner|my partner and i|my girlfriend and i|my boyfriend and i|me and my girlfriend|me and my boyfriend)\b/.test(normalized)) return 2;
+  return countNear(normalized, "people|persons?|adults?|of us")
+    ?? numberValue(normalized.match(new RegExp(`\\bfor\\s+(${NUMBER_TOKEN})\\b`, "i"))?.[1]);
+}
+
+function parseMealTypes(value: string) {
+  const normalized = value.toLowerCase();
+  return ["breakfast", "lunch", "dinner", "snack"].filter((meal) => new RegExp(`\\b${meal}(?:es|s)?\\b`, "i").test(normalized));
+}
+
+function parseDays(value: string) {
+  const normalized = value.toLowerCase();
+  const range = normalized.match(new RegExp(`\\b(${NUMBER_TOKEN})\\s*(?:-|to)\\s*(${NUMBER_TOKEN})\\s+days?\\b`, "i"));
+  if (range) {
+    const start = numberValue(range[1]);
+    const end = numberValue(range[2]);
+    return start && end ? { start, end } : null;
+  }
+  const single = countNear(normalized, "days?");
+  return single ? { start: single, end: single } : null;
+}
+
+function parseProteinTarget(value: string) {
+  const match = value.toLowerCase().match(/\b(\d{2,3})\s*(?:g|grams?)\b/);
+  return match ? Number.parseInt(match[1], 10) : null;
+}
+
+function parseMealsPerDay(value: string) {
+  return countNear(value, "meals?(?: per day| daily)?");
+}
+
+function parseWeeklyFrequency(value: string) {
+  const normalized = value.toLowerCase();
+  const match = normalized.match(new RegExp(`\\b(${NUMBER_TOKEN})\\s*(?:times?|days?|sessions?)\\s*(?:a|per)?\\s*week\\b`, "i"));
+  return numberValue(match?.[1]);
+}
+
+function parseWeekdays(value: string) {
+  const normalized = value.toLowerCase();
+  return ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    .filter((day) => new RegExp(`\\b${day.toLowerCase()}\\b`).test(normalized));
+}
+
+const COMMON_PROTEINS = [
+  "chicken", "turkey", "beef", "pork", "fish", "salmon", "tuna", "shrimp", "tofu", "eggs", "egg", "beans", "lentils", "greek yogurt", "cottage cheese",
+];
+
+function parseFoodDetails(value: string) {
+  const normalized = value.toLowerCase();
+  const avoided = COMMON_PROTEINS.filter((food) => {
+    const foodPattern = food.replace(" ", "\\s+");
+    return new RegExp(`(?:\\bno\\s+|\\bavoid(?:ing)?\\s+|\\bdon['’]?t\\s+(?:like|eat)\\s+|\\ballergic\\s+to\\s+)${foodPattern}\\b`, "i").test(normalized);
+  });
+  const preferred = COMMON_PROTEINS.filter((food) => {
+    const foodPattern = food.replace(" ", "\\s+");
+    const present = new RegExp(`\\b${foodPattern}\\b`, "i").test(normalized);
+    return present && !avoided.includes(food);
+  });
+  return { preferred: [...new Set(preferred)], avoided: [...new Set(avoided)] };
 }
 
 function estimatedMonthlyTakeHome(context: JoyeRichContext) {
@@ -206,82 +305,171 @@ function homeReply(context: JoyeRichContext): CoachReply {
   };
 }
 
-function fitnessReply(context: JoyeRichContext, question: string): CoachReply {
+function fitnessReply(context: JoyeRichContext, question: string, priorUserMessages: string[] = []): CoachReply {
+  const combined = conversationText(question, priorUserMessages);
   const goal = findRelevantGoal(
     context,
-    question,
+    combined,
     ["gym", "workout", "exercise", "fitness", "training", "routine"],
     ["health", "habit"],
   );
-  const frequency = goal?.weeklyFrequency;
+  const statedFrequency = parseWeeklyFrequency(question) ?? parseWeeklyFrequency(combined);
+  const frequency = statedFrequency ?? goal?.weeklyFrequency;
+  const weekdays = parseWeekdays(combined);
   const firstStep = goal?.openSteps[0];
   const time = Math.max(15, context.profile.availableMinutes || 30);
+  const scheduleLine = weekdays.length
+    ? `You already named ${joinNaturally(weekdays)}, so use those as the default training days.`
+    : frequency
+      ? `Choose ${frequency} repeatable training days and keep the same default time when possible.`
+      : "Choose a realistic weekly frequency and fixed days before worrying about a long streak.";
+  const followUpLine = priorHasIntent(priorUserMessages, "fitness")
+    ? "That gives Joye enough to move from general advice to a repeatable schedule."
+    : "The goal is to remove decisions from training days.";
 
   return {
     answer: goal
-      ? `For “${goal.title},” the biggest win is making the routine easier to repeat. ${frequency ? `Your saved target is ${frequency} sessions per week.` : "Choose a realistic weekly frequency before worrying about a long streak."} Use fixed days or time blocks, and make the minimum version small enough to complete on a low-motivation day—about ${Math.min(time, 30)} minutes based on your saved availability. ${firstStep ? `Your next saved step is “${firstStep}.”` : "The next step is to choose the exact days you will train."}`
-      : `To become more consistent with the gym, reduce the number of decisions required on training days. Pick specific days, define a minimum workout you can finish in about ${Math.min(time, 30)} minutes, prepare your clothes or gym bag ahead of time, and track attendance rather than judging every session. Joye does not see a clearly matching fitness goal yet, so it will not pretend another goal is related.`,
+      ? `${followUpLine} For “${goal.title},” ${frequency ? `use ${frequency} sessions per week as the working target.` : "start with a frequency you can still maintain on a busy week."} ${scheduleLine} Make the minimum version small enough to complete on a low-motivation day—about ${Math.min(time, 30)} minutes based on your saved availability. ${firstStep ? `Your next saved step is “${firstStep}.”` : "Your next step is to put the sessions onto specific days."}`
+      : `${followUpLine} ${scheduleLine} Define a minimum workout you can finish in about ${Math.min(time, 30)} minutes, prepare your clothes or gym bag ahead of time, and track attendance instead of grading every session. Joye does not see a clearly matching fitness goal yet, so it will not attach an unrelated goal.`,
     suggestedActions: [
-      firstStep || "Create a fitness goal and choose realistic training days",
+      firstStep || (weekdays.length ? `Schedule ${joinNaturally(weekdays)}` : "Create a fitness goal and choose training days"),
       `Define a ${Math.min(time, 30)}-minute minimum workout for busy days`,
       "Use I did this today after every completed session",
     ],
-    usedContext: ["Matching fitness goal", "Weekly frequency", "Available time"],
+    usedContext: ["Matching fitness goal", "Weekly frequency", "Named training days", "Available time"],
   };
 }
 
-function nutritionReply(context: JoyeRichContext, question: string): CoachReply {
+function nutritionReply(context: JoyeRichContext, question: string, priorUserMessages: string[] = []): CoachReply {
+  const combined = conversationText(question, priorUserMessages);
   const goal = findRelevantGoal(
     context,
-    question,
+    combined,
     ["protein", "nutrition", "macro", "calorie", "meal", "diet", "food"],
     ["health", "habit"],
   );
   const preference = matchingMemory(context, ["protein", "food", "diet", "meal", "allergy", "dislike"]);
-  const target = goal?.targetValue != null
-    ? `${goal.targetValue}${goal.unit ? ` ${goal.unit}` : ""}`
+  const statedTarget = parseProteinTarget(question) ?? parseProteinTarget(combined);
+  const targetValue = statedTarget ?? goal?.targetValue ?? null;
+  const target = targetValue != null
+    ? `${targetValue}${goal?.unit ? ` ${goal.unit}` : " g"}`
     : null;
+  const mealsPerDay = parseMealsPerDay(question) ?? parseMealsPerDay(combined);
+  const perMeal = targetValue && mealsPerDay ? Math.round(targetValue / mealsPerDay) : null;
   const available = Math.max(15, context.profile.availableMinutes || 30);
 
   const targetLine = target
-    ? `Your saved target is ${target}.`
+    ? `Use ${target} as the working daily target${statedTarget ? " you just provided" : " saved in Joye"}.`
     : "Joye does not see a saved daily protein target, so it should not invent one.";
   const goalLine = goal ? `The closest saved goal is “${goal.title}.”` : "There is no clearly matching nutrition goal yet.";
   const preferenceLine = preference ? `A saved preference that may matter is: “${preference.text}.”` : "No food preferences or restrictions are saved yet.";
-
-  const followUp = target
-    ? "One detail Joye still needs for a truly personalized plan: which protein foods do you actually enjoy, and across how many meals do you want to spread the target?"
-    : "Two details Joye still needs for a truly personalized plan: what daily target are you using, and which protein foods do you actually enjoy?";
+  const splitLine = perMeal
+    ? `Across ${mealsPerDay} meals, that is roughly ${perMeal} g per meal; it does not need to be exact at every meal.`
+    : target
+      ? "Tell Joye how many meals you normally eat so it can divide the target into a realistic pattern."
+      : "Save the target you are following and the protein foods you actually enjoy.";
 
   return {
-    answer: `${targetLine} ${goalLine} ${preferenceLine}\n\nThe simplest way to hit a protein goal is to divide it across the meals you already eat instead of trying to recover at night. Choose 3–4 repeatable protein anchors, decide the amount each meal needs to contribute, and keep one quick backup available for busy days. A ${Math.min(available, 30)}-minute prep block is enough to prepare several portions of one protein source.\n\n${followUp}`,
+    answer: `${targetLine} ${goalLine} ${preferenceLine}
+
+${splitLine} Build the day around 3–4 repeatable protein anchors and keep one quick backup available for busy days. A ${Math.min(available, 30)}-minute prep block is enough to prepare several portions of one protein source.`,
     suggestedActions: [
-      target ? `Split ${target} across your normal meals` : "Save your daily protein target in a nutrition goal",
+      perMeal ? `Aim for roughly ${perMeal} g across each of ${mealsPerDay} meals` : target ? `Choose how many meals will share ${target}` : "Save the daily protein target you are using",
       "Choose three repeatable protein anchors",
-      "Add one quick backup option for busy days",
+      preference ? "Use the saved food preference when building the grocery list" : "Tell Joye which protein foods you enjoy and avoid",
     ],
-    usedContext: ["Matching nutrition goal", "Saved target and unit", "Food preferences", "Available time"],
+    usedContext: ["Matching nutrition goal", "Saved or stated target", "Meal count", "Food preferences", "Available time"],
   };
 }
 
-function mealPrepReply(context: JoyeRichContext, question: string): CoachReply {
+function mealPrepReply(context: JoyeRichContext, question: string, priorUserMessages: string[] = []): CoachReply {
+  const combined = conversationText(question, priorUserMessages);
   const goal = findRelevantGoal(
     context,
-    question,
+    combined,
     ["meal", "prep", "protein", "nutrition", "food", "cook"],
     ["health", "habit"],
   );
   const preference = matchingMemory(context, ["food", "meal", "diet", "allergy", "dislike", "protein"]);
   const time = Math.max(15, context.profile.availableMinutes || 30);
+  const people = parsePeople(question) ?? parsePeople(combined);
+  const mealTypes = parseMealTypes(combined);
+  const days = parseDays(question) ?? parseDays(combined);
+  const statedFoods = parseFoodDetails(question);
+  const isFollowUp = priorHasIntent(priorUserMessages, "mealprep");
   const goalLine = goal ? `This can support your saved goal “${goal.title}.”` : "Joye does not see a clearly matching meal or nutrition goal yet.";
-  const preferenceLine = preference ? `I also see this saved preference: “${preference.text}.”` : "Your preferred foods and restrictions are not saved yet.";
+  const statedPreferenceParts = [
+    statedFoods.preferred.length ? `you chose ${joinNaturally(statedFoods.preferred)}` : null,
+    statedFoods.avoided.length ? `you want to avoid ${joinNaturally(statedFoods.avoided)}` : null,
+  ].filter((item): item is string => Boolean(item));
+  const preferenceLine = statedPreferenceParts.length
+    ? `From this answer, Joye understands that ${joinNaturally(statedPreferenceParts)}.`
+    : preference
+      ? `I also see this saved preference: “${preference.text}.”`
+      : "Your preferred foods and restrictions are not saved yet.";
+
+  if (people && mealTypes.length) {
+    const mealsPerDay = mealTypes.length;
+    const mealsLabel = joinNaturally(mealTypes);
+    const portionsLine = days
+      ? days.start === days.end
+        ? `For ${people} ${people === 1 ? "person" : "people"}, ${mealsLabel}, and ${days.start} days, prepare ${people * mealsPerDay * days.start} total portions.`
+        : `For ${people} ${people === 1 ? "person" : "people"} and ${mealsLabel}, prepare ${people * mealsPerDay * days.start}–${people * mealsPerDay * days.end} total portions for ${days.start}–${days.end} days.`
+      : `That is ${people * mealsPerDay} portions per day. A 2-day prep needs ${people * mealsPerDay * 2} portions; a 3-day prep needs ${people * mealsPerDay * 3}.`;
+    const recipeCount = mealTypes.length === 1 ? 1 : 2;
+    const recipeDirection = statedFoods.preferred.length >= 2
+      ? `Use ${statedFoods.preferred[0]} for one recipe and ${statedFoods.preferred[1]} for the other.`
+      : statedFoods.preferred.length === 1
+        ? `Use ${statedFoods.preferred[0]} as the first protein and choose one second protein or repeat it.`
+        : recipeCount === 1
+          ? "Choose one repeatable recipe."
+          : "Choose one lunch recipe and one dinner recipe.";
+    const followUp = !days
+      ? "Choose whether this batch should cover 2 or 3 days, then Joye can lock the quantities."
+      : statedFoods.preferred.length
+        ? "The serving count and protein direction are set. The next detail is which flavors or recipes you both prefer."
+        : preference
+          ? "The serving count is set; the next move is choosing recipes that match the saved preference."
+          : "The serving count is set. Tell Joye any dislikes, allergies, and two proteins you both enjoy before choosing recipes.";
+
+    return {
+      answer: `${isFollowUp ? "Got it—Joye used that answer instead of restarting the meal-prep questions." : "Here is the working meal-prep structure."} ${portionsLine}
+
+${recipeDirection} Portion everything immediately after cooking. ${goalLine} ${preferenceLine}
+
+${followUp}`,
+      suggestedActions: [
+        days ? `Prepare ${people * mealsPerDay * days.start}${days.start === days.end ? "" : `–${people * mealsPerDay * days.end}`} total portions` : "Choose a 2-day or 3-day prep window",
+        statedFoods.preferred.length >= 2 ? `Choose one ${statedFoods.preferred[0]} recipe and one ${statedFoods.preferred[1]} recipe` : recipeCount === 1 ? `Choose one ${mealTypes[0]} recipe` : "Choose one lunch and one dinner recipe",
+        statedFoods.avoided.length ? `Keep ${joinNaturally(statedFoods.avoided)} out of the grocery list` : preference ? "Build the grocery list around the saved preference" : "Add dislikes, allergies, and preferred proteins",
+      ],
+      usedContext: ["Conversation follow-up", "People", "Meal types", "Prep days", "Related goal", "Food preferences"],
+    };
+  }
+
+  if (isFollowUp && (people || mealTypes.length || days)) {
+    const known: string[] = [];
+    if (people) known.push(`${people} ${people === 1 ? "person" : "people"}`);
+    if (mealTypes.length) known.push(joinNaturally(mealTypes));
+    if (days) known.push(days.start === days.end ? `${days.start} days` : `${days.start}–${days.end} days`);
+    const missing = [!people ? "how many people" : null, !mealTypes.length ? "which meals" : null, !days ? "2 or 3 days" : null].filter((item): item is string => Boolean(item));
+    return {
+      answer: `Joye saved the useful part of your answer: ${joinNaturally(known)}. It still needs ${joinNaturally(missing)} before calculating portions and building the plan. ${preferenceLine}`,
+      suggestedActions: missing.slice(0, 3).map((item) => `Confirm ${item}`),
+      usedContext: ["Conversation follow-up", "Partial meal-prep details", "Food preferences"],
+    };
+  }
 
   return {
-    answer: `${goalLine} ${preferenceLine}\n\nFor a beta plan, keep meal prep small: choose two meals you will actually repeat, one main protein for each, one easy carbohydrate or wrap, and one vegetable or fruit. Cook enough for the next 2–3 days rather than forcing an entire week. With your saved ${time}-minute planning capacity, start by choosing the meals and building the grocery list; the cooking block can be scheduled separately.\n\nTo make this personalized, answer one thing next: how many people and how many lunches or dinners are you preparing?`,
+    answer: `${goalLine} ${preferenceLine}
+
+Keep the first prep small: choose two meals you will actually repeat, one main protein for each, one easy carbohydrate or wrap, and one vegetable or fruit. Cook enough for the next 2–3 days rather than forcing an entire week. With your saved ${time}-minute planning capacity, start by choosing the meals and building the grocery list; schedule the cooking block separately.
+
+To personalize it, answer in one line: how many people, which meals, and whether you want 2 or 3 days?`,
     suggestedActions: [
-      "Choose two meals for the next 2–3 days",
-      "Build one grocery list around those meals",
-      "Schedule a separate cooking block in Weekly",
+      "State the number of people",
+      "Choose breakfast, lunch, dinner, or snacks",
+      "Choose a 2-day or 3-day prep window",
     ],
     usedContext: ["Related health goal", "Saved food preferences", "Available time"],
   };
@@ -441,9 +629,9 @@ export function buildLocalCoachReply(
 ): CoachReply {
   const intent = inferCoachIntent(section, question, priorUserMessages);
   if (intent === "home") return homeReply(context);
-  if (intent === "fitness") return fitnessReply(context, question);
-  if (intent === "nutrition") return nutritionReply(context, question);
-  if (intent === "mealprep") return mealPrepReply(context, question);
+  if (intent === "fitness") return fitnessReply(context, question, priorUserMessages);
+  if (intent === "nutrition") return nutritionReply(context, question, priorUserMessages);
+  if (intent === "mealprep") return mealPrepReply(context, question, priorUserMessages);
   if (intent === "sleep") return sleepReply(context, question);
   if (intent === "stress") return stressReply(context);
   if (intent === "debt") return debtReply(context);

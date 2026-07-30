@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -51,23 +52,26 @@ const steps = [
 function DashboardPreview() {
   return (
     <div className="relative mx-auto w-full max-w-[720px]">
-      <div className="absolute -left-10 top-20 h-48 w-48 rounded-full bg-joye-300/30 blur-3xl" />
-      <div className="absolute -right-8 bottom-14 h-56 w-56 rounded-full bg-blue-200/40 blur-3xl" />
+      <div className="absolute -left-10 top-16 h-52 w-52 rounded-full bg-joye-400/25 blur-3xl" />
+      <div className="absolute -right-8 bottom-10 h-64 w-64 rounded-full bg-aqua/20 blur-3xl" />
+      <div className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-mint/15 blur-3xl" />
 
-      <div className="relative overflow-hidden rounded-[2rem] border border-black/10 bg-[#f7f8fb] shadow-[0_35px_90px_rgba(30,64,175,.18)]">
-        <div className="flex items-center justify-between border-b border-black/5 bg-white px-4 py-3 sm:px-5">
+      <div className="brand-ring relative overflow-hidden rounded-[2rem] border border-white/70 bg-[#f8f9fd] shadow-[0_38px_100px_rgba(37,45,120,.20)]">
+        <div className="flex items-center justify-between border-b border-joye-100 bg-white/95 px-4 py-3 sm:px-5">
           <div className="flex items-center gap-2">
             <div className="h-2.5 w-2.5 rounded-full bg-red-300" />
             <div className="h-2.5 w-2.5 rounded-full bg-amber-300" />
             <div className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
           </div>
-          <div className="rounded-full bg-mist px-4 py-1.5 text-[11px] font-medium text-black/45">app.joyelife</div>
+          <div className="rounded-full bg-joye-50 px-4 py-1.5 text-[11px] font-medium text-joye-900/60">www.joye-life.com</div>
           <div className="w-10" />
         </div>
 
         <div className="grid min-h-[500px] grid-cols-[68px_1fr] sm:grid-cols-[170px_1fr]">
-          <aside className="border-r border-black/5 bg-white p-3 sm:p-4">
-            <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-2xl bg-joye-600 font-bold text-white">J</div>
+          <aside className="border-r border-joye-100 bg-white p-3 sm:p-4">
+            <div className="mb-6 h-10 w-10 overflow-hidden rounded-2xl shadow-brand">
+              <Image src="/brand/joye-mark-dark.png" alt="Joye Life" width={40} height={40} className="h-full w-full object-cover" />
+            </div>
             <div className="space-y-2">
               {[
                 [Sparkles, "Today"],
@@ -81,7 +85,7 @@ function DashboardPreview() {
                   <div
                     key={label as string}
                     className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold ${
-                      index === 0 ? "bg-joye-50 text-joye-700" : "text-black/45"
+                      index === 0 ? "brand-gradient text-white shadow-sm" : "text-black/45"
                     }`}
                   >
                     <ItemIcon size={16} />
@@ -99,25 +103,25 @@ function DashboardPreview() {
                 <h3 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">Good morning, Jordan.</h3>
                 <p className="mt-1 text-xs text-black/45 sm:text-sm">Here is what needs your attention today.</p>
               </div>
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white shadow-sm">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-joye-700 shadow-sm">
                 <BellRing size={15} />
               </div>
             </div>
 
-            <div className="mt-5 rounded-2xl bg-gradient-to-br from-joye-600 to-blue-700 p-5 text-white shadow-lg shadow-blue-200/60">
+            <div className="brand-gradient mt-5 rounded-2xl p-5 text-white shadow-brand">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-semibold uppercase tracking-[.2em] text-white/65">Your next move</span>
+                <span className="text-[10px] font-semibold uppercase tracking-[.2em] text-white/70">Your next move</span>
                 <Sparkles size={16} />
               </div>
               <p className="mt-3 text-lg font-semibold sm:text-xl">Finish the 30-minute step toward your highest-priority goal.</p>
-              <p className="mt-2 text-xs leading-5 text-white/70 sm:text-sm">It fits your available time and keeps your weekly plan moving without overloading your day.</p>
+              <p className="mt-2 text-xs leading-5 text-white/75 sm:text-sm">It fits your available time and keeps your weekly plan moving without overloading your day.</p>
               <button className="mt-4 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-joye-700">Start focus session</button>
             </div>
 
             <div className="mt-4 grid gap-3 md:grid-cols-2">
-              <div className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
+              <div className="rounded-2xl border border-joye-100 bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm font-semibold"><CreditCard size={15} /> Upcoming bills</div>
+                  <div className="flex items-center gap-2 text-sm font-semibold"><CreditCard size={15} className="text-joye-600" /> Upcoming bills</div>
                   <span className="text-[10px] text-black/35">Next 7 days</span>
                 </div>
                 <div className="mt-3 space-y-2">
@@ -125,27 +129,27 @@ function DashboardPreview() {
                     ["Phone", "$92", "Tomorrow"],
                     ["Car insurance", "$148", "Aug 3"],
                   ].map(([name, amount, date]) => (
-                    <div key={name} className="flex items-center justify-between rounded-xl bg-mist px-3 py-2.5">
+                    <div key={name} className="flex items-center justify-between rounded-xl bg-joye-50/70 px-3 py-2.5">
                       <div>
                         <p className="text-xs font-semibold">{name}</p>
                         <p className="mt-0.5 text-[10px] text-black/40">{date}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-semibold">{amount}</span>
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full border border-black/10"><Check size={11} /></span>
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full border border-joye-200"><Check size={11} /></span>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
+              <div className="rounded-2xl border border-joye-100 bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm font-semibold"><TrendingUp size={15} /> Weekly progress</div>
+                  <div className="flex items-center gap-2 text-sm font-semibold"><TrendingUp size={15} className="text-joye-600" /> Weekly progress</div>
                   <span className="text-xs font-semibold text-joye-600">68%</span>
                 </div>
-                <div className="mt-4 h-2 overflow-hidden rounded-full bg-mist">
-                  <div className="h-full w-[68%] rounded-full bg-joye-600" />
+                <div className="mt-4 h-2 overflow-hidden rounded-full bg-joye-50">
+                  <div className="brand-gradient h-full w-[68%] rounded-full" />
                 </div>
                 <div className="mt-4 space-y-2 text-xs">
                   <div className="flex items-center gap-2"><span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50 text-emerald-600"><Check size={11} /></span>Review this paycheck</div>
@@ -157,14 +161,14 @@ function DashboardPreview() {
         </div>
       </div>
 
-      <div className="absolute -bottom-8 -left-2 hidden w-52 rounded-2xl border border-black/5 bg-white p-4 shadow-xl sm:block">
+      <div className="absolute -bottom-8 -left-2 hidden w-52 rounded-2xl border border-joye-100 bg-white p-4 shadow-xl sm:block">
         <div className="flex items-center gap-2 text-xs font-semibold"><Dumbbell size={15} className="text-joye-600" /> Goal check-in</div>
         <p className="mt-2 text-sm font-semibold">Gym routine</p>
         <p className="mt-1 text-xs text-black/45">2 of 3 visits this week</p>
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-mist"><div className="h-full w-2/3 rounded-full bg-joye-600" /></div>
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-joye-50"><div className="brand-gradient h-full w-2/3 rounded-full" /></div>
       </div>
 
-      <div className="absolute -right-4 top-16 hidden w-48 rounded-2xl border border-black/5 bg-white p-4 shadow-xl lg:block">
+      <div className="absolute -right-4 top-16 hidden w-48 rounded-2xl border border-joye-100 bg-white p-4 shadow-xl lg:block">
         <div className="flex items-center gap-2 text-xs font-semibold"><WalletCards size={15} className="text-joye-600" /> Paycheck plan</div>
         <p className="mt-3 text-2xl font-semibold">$346</p>
         <p className="text-xs text-black/40">Still available</p>
@@ -177,37 +181,41 @@ function DashboardPreview() {
 export default function HomePage() {
   return (
     <main className="overflow-hidden">
-      <MarketingHeader />
+      <div className="relative">
+        <div className="pointer-events-none absolute left-[-12rem] top-[-14rem] h-[34rem] w-[34rem] rounded-full bg-joye-400/15 blur-3xl" />
+        <div className="pointer-events-none absolute right-[-12rem] top-[-12rem] h-[34rem] w-[34rem] rounded-full bg-aqua/15 blur-3xl" />
+        <MarketingHeader />
 
-      <section className="shell grid min-h-[78vh] items-center gap-14 pb-24 pt-10 lg:grid-cols-[.9fr_1.1fr] lg:pt-16">
-        <div className="relative z-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-joye-200 bg-white px-3 py-1.5 text-xs font-semibold text-joye-700 shadow-sm">
-            <Sparkles size={13} /> Built around your actual life
+        <section className="shell grid min-h-[78vh] items-center gap-14 pb-24 pt-10 lg:grid-cols-[.9fr_1.1fr] lg:pt-16">
+          <div className="relative z-10">
+            <div className="inline-flex items-center gap-2 rounded-full border border-joye-200 bg-white/80 px-3 py-1.5 text-xs font-semibold text-joye-700 shadow-sm backdrop-blur">
+              <Sparkles size={13} /> Built around your actual life
+            </div>
+            <h1 className="mt-6 max-w-3xl text-5xl font-semibold leading-[1.01] tracking-[-0.055em] sm:text-7xl">
+              Know what to do next—<span className="brand-text">without the chaos.</span>
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-black/60">
+              Joye Life brings your money, career, goals, and weekly priorities into one personalized daily plan that changes as your life changes.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/apply" className="button-primary gap-2">Apply for early access <ArrowRight size={16} /></Link>
+              <a href="#preview" className="button-secondary">See how it works</a>
+            </div>
+            <div className="mt-7 grid max-w-xl gap-3 text-sm text-black/55 sm:grid-cols-2">
+              {["Personalized setup", "Paycheck-by-paycheck planning", "Adaptive goals", "Guided career path"].map((item) => (
+                <div key={item} className="flex items-center gap-2">
+                  <span className="brand-gradient flex h-5 w-5 items-center justify-center rounded-full text-white"><Check size={12} /></span>
+                  {item}
+                </div>
+              ))}
+            </div>
           </div>
-          <h1 className="mt-6 max-w-3xl text-5xl font-semibold leading-[1.01] tracking-[-0.055em] sm:text-7xl">
-            Know what to do next—without juggling five different apps.
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-black/60">
-            Joye Life brings your money, career, goals, and weekly priorities into one personalized daily plan that changes as your life changes.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/apply" className="button-primary gap-2">Apply for early access <ArrowRight size={16} /></Link>
-            <a href="#preview" className="button-secondary">See how it works</a>
-          </div>
-          <div className="mt-7 grid max-w-xl gap-3 text-sm text-black/55 sm:grid-cols-2">
-            {["Personalized setup", "Paycheck-by-paycheck planning", "Adaptive goals", "Guided career path"].map((item) => (
-              <div key={item} className="flex items-center gap-2">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-joye-100 text-joye-700"><Check size={12} /></span>
-                {item}
-              </div>
-            ))}
-          </div>
-        </div>
 
-        <DashboardPreview />
-      </section>
+          <DashboardPreview />
+        </section>
+      </div>
 
-      <section id="preview" className="border-y border-black/5 bg-white py-24">
+      <section id="preview" className="border-y border-joye-100 bg-white/85 py-24 backdrop-blur">
         <div className="shell">
           <div className="mx-auto max-w-3xl text-center">
             <p className="eyebrow">One place to run your life</p>
@@ -218,37 +226,37 @@ export default function HomePage() {
           <div className="mt-14 grid gap-5 md:grid-cols-2">
             {features.map(({ icon: Icon, title, text }, index) => (
               <article key={title} className="card group overflow-hidden p-6 sm:p-8">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-joye-50 text-joye-700 transition group-hover:-translate-y-1">
+                <div className="brand-gradient flex h-11 w-11 items-center justify-center rounded-2xl text-white shadow-brand transition group-hover:-translate-y-1">
                   <Icon size={20} />
                 </div>
                 <h3 className="mt-6 text-2xl font-semibold tracking-tight">{title}</h3>
                 <p className="mt-3 max-w-xl leading-7 text-black/55">{text}</p>
-                <div className="mt-7 rounded-2xl bg-mist p-4">
+                <div className="brand-gradient-soft mt-7 rounded-2xl border border-joye-100 p-4">
                   {index === 0 && (
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm font-semibold"><ListChecks size={15} /> Today’s focus</div>
-                      <div className="rounded-xl bg-white p-3 text-sm">Finish one meaningful step before adding anything else.</div>
+                      <div className="rounded-xl bg-white p-3 text-sm shadow-sm">Finish one meaningful step before adding anything else.</div>
                     </div>
                   )}
                   {index === 1 && (
                     <div className="grid grid-cols-3 gap-2 text-center">
                       <div className="rounded-xl bg-white p-3"><p className="text-xs text-black/40">Paycheck</p><p className="mt-1 font-semibold">$1,850</p></div>
                       <div className="rounded-xl bg-white p-3"><p className="text-xs text-black/40">Assigned</p><p className="mt-1 font-semibold">$1,504</p></div>
-                      <div className="rounded-xl bg-joye-600 p-3 text-white"><p className="text-xs text-white/65">Available</p><p className="mt-1 font-semibold">$346</p></div>
+                      <div className="brand-gradient rounded-xl p-3 text-white"><p className="text-xs text-white/70">Available</p><p className="mt-1 font-semibold">$346</p></div>
                     </div>
                   )}
                   {index === 2 && (
                     <div className="flex items-center gap-3">
                       {["Build", "Prove", "Move"].map((phase, phaseIndex) => (
                         <div key={phase} className="flex flex-1 items-center gap-2">
-                          <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${phaseIndex === 0 ? "bg-joye-600 text-white" : "bg-white text-black/45"}`}>{phaseIndex + 1}</span>
+                          <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${phaseIndex === 0 ? "brand-gradient text-white" : "bg-white text-black/45"}`}>{phaseIndex + 1}</span>
                           <span className="text-xs font-semibold">{phase}</span>
                         </div>
                       ))}
                     </div>
                   )}
                   {index === 3 && (
-                    <div className="flex items-center justify-between rounded-xl bg-white p-3">
+                    <div className="flex items-center justify-between rounded-xl bg-white p-3 shadow-sm">
                       <div><p className="text-sm font-semibold">Build a consistent gym routine</p><p className="mt-1 text-xs text-black/40">Track weekly consistency—not an arbitrary finish date.</p></div>
                       <Flag size={18} className="text-joye-600" />
                     </div>
@@ -272,8 +280,8 @@ export default function HomePage() {
           <div className="card p-5 sm:p-8">
             <div className="space-y-3">
               {steps.map((step, index) => (
-                <div key={step} className="flex items-center gap-4 rounded-2xl border border-black/5 bg-mist p-4">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-sm font-semibold text-joye-700 shadow-sm">{index + 1}</span>
+                <div key={step} className="flex items-center gap-4 rounded-2xl border border-joye-100 bg-joye-50/55 p-4">
+                  <span className="brand-gradient flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-sm font-semibold text-white shadow-sm">{index + 1}</span>
                   <div>
                     <p className="font-semibold">{step}</p>
                     <p className="mt-1 text-sm text-black/45">
@@ -291,21 +299,26 @@ export default function HomePage() {
       </section>
 
       <section className="shell pb-24">
-        <div className="overflow-hidden rounded-[2rem] bg-ink px-6 py-12 text-white sm:px-12 sm:py-16">
-          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div className="brand-panel relative overflow-hidden rounded-[2rem] px-6 py-12 text-white sm:px-12 sm:py-16">
+          <Image src="/brand/joye-mark-transparent.png" alt="" width={390} height={390} className="pointer-events-none absolute -bottom-24 -right-16 opacity-30" />
+          <div className="relative grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[.2em] text-blue-300">Private beta</p>
+              <p className="text-xs font-semibold uppercase tracking-[.2em] text-mint">Private beta</p>
               <h2 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Help shape a more useful way to plan your life.</h2>
-              <p className="mt-5 max-w-2xl text-lg leading-8 text-white/60">We are inviting a small group of early users who want clearer guidance around money, career, goals, and weekly planning.</p>
+              <p className="mt-5 max-w-2xl text-lg leading-8 text-white/65">We are inviting a small group of early users who want clearer guidance around money, career, goals, and weekly planning.</p>
             </div>
             <div className="flex flex-wrap gap-3 lg:justify-end">
               <Link href="/apply" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-ink transition hover:-translate-y-0.5">Apply for access <ArrowRight size={16} /></Link>
-              <Link href="/login" className="inline-flex items-center justify-center rounded-2xl border border-white/15 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10">Member sign in</Link>
+              <Link href="/login" className="inline-flex items-center justify-center rounded-2xl border border-white/20 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10">Member sign in</Link>
             </div>
           </div>
         </div>
       </section>
-      <footer className="shell flex flex-col gap-4 border-t border-black/5 py-8 text-sm text-black/45 sm:flex-row sm:items-center sm:justify-between"><p>© 2026 Joye Life · Private beta</p><div className="flex gap-5"><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/login">Member sign in</Link></div></footer>
+
+      <footer className="shell flex flex-col gap-4 border-t border-joye-100 py-8 text-sm text-black/45 sm:flex-row sm:items-center sm:justify-between">
+        <p>© 2026 Joye Life · Private beta</p>
+        <div className="flex flex-wrap gap-5"><a href="mailto:info@joye-life.com">info@joye-life.com</a><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/login">Member sign in</Link></div>
+      </footer>
     </main>
   );
 }

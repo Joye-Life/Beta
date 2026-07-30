@@ -110,14 +110,14 @@ export function CoachExperience({
     : "No paid AI requests";
 
   return <div className="mx-auto max-w-5xl space-y-5">
-    <section className="card overflow-hidden border-blue-100">
-      <div className="bg-gradient-to-br from-blue-700 to-blue-500 p-6 text-white sm:p-8">
+    <section className="card overflow-hidden border-joye-100">
+      <div className="brand-gradient p-6 text-white sm:p-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[.18em] text-white/65">Ask Joye</p>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Guidance that uses the plan you already built.</h1>
             <p className="mt-3 max-w-2xl leading-7 text-white/75">
-              Joye uses your saved goals, money, career, weekly plan, and memory. Guided mode handles supported planning topics honestly; AI enhancement answers broader natural-language questions when enabled.
+              Joye uses your saved goals, money, career, weekly plan, and memory. Guided mode handles supported planning topics, remembers recent answers in the current conversation, and asks only for details it still needs. AI enhancement answers broader natural-language questions when enabled.
             </p>
           </div>
           <div className="rounded-2xl bg-white/10 px-4 py-3 text-sm">
@@ -126,30 +126,30 @@ export function CoachExperience({
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-2 overflow-x-auto border-b border-blue-100 bg-white p-3 sm:px-6">
+      <div className="flex items-center gap-2 overflow-x-auto border-b border-joye-100 bg-white p-3 sm:px-6">
         {sections.map(({ value, label, icon: Icon }) => <button
           key={value}
           type="button"
           onClick={() => startFresh(value)}
-          className={clsx("flex min-h-11 shrink-0 items-center gap-2 rounded-2xl px-4 text-sm font-semibold", section === value ? "bg-blue-600 text-white" : "bg-blue-50 text-blue-800")}
+          className={clsx("flex min-h-11 shrink-0 items-center gap-2 rounded-2xl px-4 text-sm font-semibold", section === value ? "brand-gradient text-white" : "bg-joye-50 text-joye-800")}
         ><Icon size={16}/>{label}</button>)}
         <button type="button" onClick={() => startFresh()} className="ml-auto flex min-h-11 shrink-0 items-center gap-2 rounded-2xl border border-black/10 bg-white px-4 text-sm font-semibold text-black/55"><RotateCcw size={15}/>Start fresh</button>
       </div>
       <div className="min-h-[360px] space-y-4 bg-[#f7f8fb] p-4 sm:p-6">
         {!messages.length ? <div className="grid min-h-[270px] place-items-center text-center">
           <div>
-            <span className="mx-auto grid h-14 w-14 place-items-center rounded-3xl bg-blue-600 text-white"><Sparkles size={22}/></span>
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-3xl brand-gradient text-white"><Sparkles size={22}/></span>
             <h2 className="mt-5 text-2xl font-semibold">What should we work through?</h2>
             <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-black/50">
               Guided mode is strongest for money, career, goals, weekly planning, fitness routines, nutrition structure, meal prep, home preparation, sleep routines, and today’s priorities. It will ask for missing details instead of attaching an unrelated goal.
             </p>
             <div className="mx-auto mt-5 flex max-w-2xl flex-wrap justify-center gap-2">
-              {suggestions.map((suggestion) => <button key={suggestion} onClick={() => submit(suggestion)} className="rounded-2xl border border-blue-100 bg-white px-4 py-3 text-left text-sm font-semibold text-blue-800 shadow-sm">{suggestion}</button>)}
+              {suggestions.map((suggestion) => <button key={suggestion} onClick={() => submit(suggestion)} className="rounded-2xl border border-joye-100 bg-white px-4 py-3 text-left text-sm font-semibold text-joye-800 shadow-sm">{suggestion}</button>)}
             </div>
           </div>
         </div> : messages.map((message) => <article
           key={message.id}
-          className={clsx("max-w-[94%] whitespace-pre-wrap rounded-3xl px-4 py-3 text-sm leading-6 sm:max-w-[78%]", message.role === "user" ? "ml-auto bg-blue-600 text-white" : "bg-white text-black/70 shadow-sm")}
+          className={clsx("max-w-[94%] whitespace-pre-wrap rounded-3xl px-4 py-3 text-sm leading-6 sm:max-w-[78%]", message.role === "user" ? "ml-auto brand-gradient text-white" : "bg-white text-black/70 shadow-sm")}
         >
           <p>{message.content}</p>
           {message.role === "assistant" && message.provider ? <p className="mt-3 text-[10px] font-semibold uppercase tracking-wide text-black/35">
@@ -158,7 +158,7 @@ export function CoachExperience({
         </article>)}
         {sending ? <div className="w-fit rounded-3xl bg-white px-4 py-3 text-sm text-black/45 shadow-sm">Joye is reviewing your plan…</div> : null}
       </div>
-      <form ref={formRef} onSubmit={(event) => { event.preventDefault(); void submit(); }} className="border-t border-blue-100 bg-white p-3 sm:p-5">
+      <form ref={formRef} onSubmit={(event) => { event.preventDefault(); void submit(); }} className="border-t border-joye-100 bg-white p-3 sm:p-5">
         {error ? <p className="mb-3 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
         {notice ? <p className="mb-3 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-800">{notice}</p> : null}
         <div className="flex items-end gap-2">
@@ -171,7 +171,7 @@ export function CoachExperience({
             placeholder={`Ask Joye about ${section === "general" ? "your plan or routine" : section}…`}
             maxLength={1200}
           />
-          <button type="submit" disabled={!input.trim() || sending} aria-label="Send question" className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-blue-600 text-white disabled:opacity-40"><ArrowUp size={19}/></button>
+          <button type="submit" disabled={!input.trim() || sending} aria-label="Send question" className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl brand-gradient text-white disabled:opacity-40"><ArrowUp size={19}/></button>
         </div>
         <div className="mt-2 flex flex-col gap-1 text-xs text-black/35 sm:flex-row sm:items-center sm:justify-between">
           <p>Joye provides planning guidance. Review important financial, medical, nutrition, or legal decisions with an appropriate professional.</p>

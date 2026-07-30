@@ -75,14 +75,14 @@ export function PaycheckAllocator({ saveAction, typicalTakeHome, nextPayday, pay
   }
 
   return (
-    <form action={saveAction} className="card border-blue-100 p-4 sm:p-6">
+    <form action={saveAction} className="card border-joye-100 p-4 sm:p-6">
       <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
         <div>
           <p className="eyebrow">Paycheck plan</p>
           <h2 className="mt-2 text-2xl font-semibold">Give this paycheck a job</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-black/55">Joye can pull in bills and minimum debt payments due before your next paycheck. Then you can decide what to do with the rest.</p>
         </div>
-        <div className={`rounded-2xl px-4 py-3 ${Math.abs(remaining) < 0.01 ? "bg-emerald-50 text-emerald-800" : remaining < 0 ? "bg-red-50 text-red-700" : "bg-blue-50 text-blue-800"}`}>
+        <div className={`rounded-2xl px-4 py-3 ${Math.abs(remaining) < 0.01 ? "bg-emerald-50 text-emerald-800" : remaining < 0 ? "bg-red-50 text-red-700" : "bg-joye-50 text-joye-800"}`}>
           <p className="text-xs font-semibold uppercase tracking-[.14em] opacity-70">Still available</p>
           <p className="mt-1 text-2xl font-semibold">{formatMoney(remaining)}</p>
           <p className="mt-1 text-xs opacity-70">{remaining < 0 ? "This plan is over the paycheck amount." : Math.abs(remaining) < 0.01 ? "Every dollar is accounted for." : "Available for savings, spending, or another goal."}</p>
@@ -94,13 +94,13 @@ export function PaycheckAllocator({ saveAction, typicalTakeHome, nextPayday, pay
         <div><label className="label">Amount deposited</label><input className="input" type="number" step="0.01" min="0" name="paycheck_amount" value={amount} onChange={(e) => setAmount(Number(e.target.value))} required /></div>
       </div>
 
-      <button type="button" onClick={buildFromSavedItems} className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-800 hover:bg-blue-100 sm:w-auto">
+      <button type="button" onClick={buildFromSavedItems} className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-joye-50 px-4 py-3 text-sm font-semibold text-joye-800 hover:bg-joye-100 sm:w-auto">
         <Sparkles size={16} /> Build from upcoming bills and debt
       </button>
 
       <input type="hidden" name="allocations" value={JSON.stringify(rows)} />
       <div className="mt-6 space-y-3">
-        {!rows.length && <div className="rounded-2xl border border-dashed border-blue-200 bg-blue-50/40 p-5 text-sm leading-6 text-blue-900/70">No bills or debt payments are due before the next paycheck. The full deposit remains under Still available until you add savings, spending, or another category.</div>}
+        {!rows.length && <div className="rounded-2xl border border-dashed border-joye-200 bg-joye-50/40 p-5 text-sm leading-6 text-joye-900/70">No bills or debt payments are due before the next paycheck. The full deposit remains under Still available until you add savings, spending, or another category.</div>}
         {rows.map((row, index) => (
           <div key={`${row.label}-${index}`} className="rounded-2xl border border-black/8 bg-white p-3 sm:grid sm:grid-cols-[1fr_180px_44px] sm:items-end sm:gap-3 sm:border-0 sm:p-0">
             <div>

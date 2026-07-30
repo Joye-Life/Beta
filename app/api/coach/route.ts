@@ -47,19 +47,22 @@ export async function POST(request: Request) {
   const fallbackName = user.user_metadata?.display_name || user.email?.split("@")[0] || "Member";
   const context = await loadJoyeContext(supabase, user.id, fallbackName);
 
-  const { data: history } = await supabase.from("joye_messages")
+  const { data: recentHistory } = await supabase.from("joye_messages")
     .select("role,content")
     .eq("conversation_id", activeConversationId)
     .eq("user_id", user.id)
-    .order("created_at", { ascending: true })
+    .order("created_at", { ascending: false })
     .limit(14);
 
-  const userHistory = (history ?? [])
-    .filter((item: { role: string; content: string }) => item.role === "user")
-    .map((item: { role: string; content: string }) => item.content);
+  // Supabase returns the newest rows first so the limit always keeps the active
+  // part of the conversation. Reverse them before building chronological context.
+  const history = [...(recentHistory ?? [])].reverse() as Array<{ role: string; content: string }>;
+  const userHistory = history
+    .filter((item) => item.role === "user")
+    .map((item) => item.content);
   if (userHistory[userHistory.length - 1] === message) userHistory.pop();
 
-  const local = buildLocalCoachReply(context, section as CoachSection, message, userHistory.slice(-3));
+  const local = buildLocalCoachReply(context, section as CoachSection, message, userHistory.slice(-6));
   let answer = formatLocal(local);
   let provider: Provider = "guided";
   let requestId: string | null = null;
@@ -88,7 +91,7 @@ export async function POST(request: Request) {
           instructions: instructions(section as CoachSection, context.profile.planningStyle),
           input: [
             { role: "developer", content: `Saved Joye Life context:\n${JSON.stringify(contextForPrompt(context, section as CoachSection))}` },
-            ...(history ?? []).slice(-8).map((item: { role: string; content: string }) => ({ role: item.role === "assistant" ? "assistant" : "user", content: item.content })),
+            ...history.slice(-8).map((item) => ({ role: item.role === "assistant" ? "assistant" : "user", content: item.content })),
           ],
         }),
       });

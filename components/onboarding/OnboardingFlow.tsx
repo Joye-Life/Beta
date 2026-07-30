@@ -18,17 +18,17 @@ export function OnboardingFlow({ defaultName = "", error }: { defaultName?: stri
   }
 
   return (
-    <form action={completeOnboarding} className="card overflow-hidden border-blue-100">
-      <div className="border-b border-blue-100 bg-blue-50/70 p-5 sm:p-7">
+    <form action={completeOnboarding} className="card overflow-hidden border-joye-100">
+      <div className="border-b border-joye-100 bg-joye-50/70 p-5 sm:p-7">
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="eyebrow">Step {step + 1} of {steps.length}</p>
             <p className="mt-1 font-semibold text-ink">{steps[step]}</p>
           </div>
-          <div className="rounded-2xl bg-white p-3 text-blue-600 shadow-sm"><Sparkles size={20} /></div>
+          <div className="rounded-2xl bg-white p-3 text-joye-600 shadow-sm"><Sparkles size={20} /></div>
         </div>
         <div className="mt-5 h-2 overflow-hidden rounded-full bg-white">
-          <div className="h-full rounded-full bg-blue-600 transition-all duration-300" style={{ width: `${progress}%` }} />
+          <div className="h-full rounded-full brand-gradient transition-all duration-300" style={{ width: `${progress}%` }} />
         </div>
       </div>
 
@@ -42,7 +42,7 @@ export function OnboardingFlow({ defaultName = "", error }: { defaultName?: stri
           </div>
           <div><label className="label">What should Joye call you?</label><input className="input" name="display_name" defaultValue={defaultName} placeholder="Your first name" required /></div>
           <div><label className="label">What area of life matters most right now?</label><select className="input" name="primary_focus" required defaultValue=""><option value="" disabled>Choose your main focus</option><option>Getting organized</option><option>Money and stability</option><option>Career growth</option><option>Health and routines</option><option>Building something of my own</option><option>Finding more balance</option></select></div>
-          <div><label className="label">How should Joye guide you?</label><div className="grid gap-3 sm:grid-cols-3">{[["gentle","Encouraging","Supportive nudges"],["balanced","Balanced","Clear and supportive"],["direct","Direct","Straight to the point"]].map(([value,title,copy])=><label key={value} className="cursor-pointer rounded-2xl border border-blue-100 p-4 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50"><input className="sr-only" type="radio" name="planning_style" value={value} defaultChecked={value==="balanced"}/><span className="block font-semibold">{title}</span><span className="mt-1 block text-sm text-black/50">{copy}</span></label>)}</div></div>
+          <div><label className="label">How should Joye guide you?</label><div className="grid gap-3 sm:grid-cols-3">{[["gentle","Encouraging","Supportive nudges"],["balanced","Balanced","Clear and supportive"],["direct","Direct","Straight to the point"]].map(([value,title,copy])=><label key={value} className="cursor-pointer rounded-2xl border border-joye-100 p-4 has-[:checked]:border-joye-500 has-[:checked]:bg-joye-50"><input className="sr-only" type="radio" name="planning_style" value={value} defaultChecked={value==="balanced"}/><span className="block font-semibold">{title}</span><span className="mt-1 block text-sm text-black/50">{copy}</span></label>)}</div></div>
         </section>
 
         <section data-onboarding-step="1" className={step === 1 ? "grid gap-6" : "hidden"}>
@@ -62,10 +62,10 @@ export function OnboardingFlow({ defaultName = "", error }: { defaultName?: stri
           <div><label className="label">What is the first goal you want Joye to help with?</label><input className="input" name="goal_title" placeholder="Example: Create a consistent weekly routine" required /></div>
           <div><label className="label">What would progress look like?</label><textarea className="input min-h-24" name="goal_summary" placeholder="Describe what success would look or feel like." /></div>
           <div><label className="label">Target date <span className="font-normal text-black/35">(optional)</span></label><input className="input max-w-xs" type="date" name="goal_due_date" /></div>
-          <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5"><p className="font-semibold text-blue-900">Joye will use this setup to:</p><ul className="mt-3 grid gap-2 text-sm text-blue-900/75"><li className="flex gap-2"><Check size={17}/>Personalize your Today briefing</li><li className="flex gap-2"><Check size={17}/>Recommend realistic next steps</li><li className="flex gap-2"><Check size={17}/>Connect your goals, career, and weekly plan</li></ul></div>
+          <div className="rounded-2xl border border-joye-100 bg-joye-50 p-5"><p className="font-semibold text-joye-900">Joye will use this setup to:</p><ul className="mt-3 grid gap-2 text-sm text-joye-900/75"><li className="flex gap-2"><Check size={17}/>Personalize your Today briefing</li><li className="flex gap-2"><Check size={17}/>Recommend realistic next steps</li><li className="flex gap-2"><Check size={17}/>Connect your goals, career, and weekly plan</li></ul></div>
         </section>
 
-        <div className="mt-8 flex items-center justify-between border-t border-blue-100 pt-6">
+        <div className="mt-8 flex items-center justify-between border-t border-joye-100 pt-6">
           {step > 0 ? <button type="button" onClick={() => setStep((value) => value - 1)} className="button-secondary inline-flex items-center gap-2"><ArrowLeft size={17}/>Back</button> : <span />}
           {step < steps.length - 1 ? <button type="button" onClick={next} className="button-primary inline-flex items-center gap-2">Continue<ArrowRight size={17}/></button> : <button type="submit" className="button-primary inline-flex items-center gap-2">Build my plan<Sparkles size={17}/></button>}
         </div>

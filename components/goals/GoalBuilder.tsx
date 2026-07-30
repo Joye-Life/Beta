@@ -9,12 +9,12 @@ export function GoalBuilder({ action }: { action: (formData: FormData) => void |
   const frequencyGoal = ["habit", "health", "learning"].includes(kind);
   const numberGoal = kind === "financial";
 
-  return <form action={action} className="card border-blue-100 p-6 sm:p-8">
+  return <form action={action} className="card border-joye-100 p-6 sm:p-8">
     <p className="eyebrow">Create a goal with Joye</p>
     <h2 className="mt-2 text-2xl font-semibold">What do you want to improve?</h2>
     <p className="mt-2 max-w-2xl text-sm leading-6 text-black/55">Write it naturally. Joye will choose a useful structure instead of forcing every goal into dates, numbers, and units.</p>
     <textarea className="input mt-5 min-h-28" name="raw_goal" required value={rawGoal} onChange={e=>setRawGoal(e.target.value)} placeholder="I want to go to the gym more, save for an emergency fund, or move into a better role..." />
-    {rawGoal.trim() ? <div className="mt-3 inline-flex rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">Likely goal style: {goalTypeLabel(kind)}</div> : null}
+    {rawGoal.trim() ? <div className="mt-3 inline-flex rounded-full bg-joye-50 px-3 py-1.5 text-xs font-semibold text-joye-700">Likely goal style: {goalTypeLabel(kind)}</div> : null}
     <input type="hidden" name="goal_kind" value={kind}/>
 
     <div className="mt-6 grid gap-4 sm:grid-cols-2">

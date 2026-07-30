@@ -28,7 +28,7 @@ export function ApplicationReviewTable({ initialApplications }: { initialApplica
   }
 
   return <>
-    {notice && <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-900">{notice}</div>}
+    {notice && <div className="mt-6 rounded-2xl border border-joye-100 bg-joye-50 p-4 text-sm text-joye-900">{notice}</div>}
     {latestInvite && <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-black/10 bg-white p-4 sm:flex-row sm:items-center"><code className="min-w-0 flex-1 break-all text-xs">{latestInvite}</code><button className="button-secondary" onClick={() => navigator.clipboard.writeText(latestInvite)}><Copy size={15}/> Copy invite</button></div>}
     <div className="card mt-8 overflow-hidden"><div className="overflow-x-auto"><table className="w-full text-left text-sm">
       <thead className="bg-mist text-black/50"><tr><th className="p-4">Applicant</th><th className="p-4">What they need</th><th className="p-4">Usage</th><th className="p-4">Status</th><th className="p-4">Actions</th></tr></thead>

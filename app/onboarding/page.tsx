@@ -12,5 +12,5 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   const params = await searchParams;
   const fallback = profile?.display_name || user.user_metadata?.display_name || user.email?.split("@")[0] || "";
 
-  return <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#dbeafe_0,transparent_32%),#f8fbff] px-4 py-7 sm:px-6"><div className="mx-auto max-w-3xl"><Logo href="/"/><div className="mt-10"><OnboardingFlow defaultName={fallback} error={params.error}/></div><p className="mt-5 text-center text-xs leading-5 text-black/40">Your answers stay private and can be changed later from Profile.</p></div></main>;
+  return <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(155,60,255,.16)_0,transparent_34%),radial-gradient(circle_at_top_right,rgba(24,197,239,.14)_0,transparent_32%),#f7f8fc] px-4 py-7 sm:px-6"><div className="mx-auto max-w-3xl"><Logo href="/"/><div className="mt-10"><OnboardingFlow defaultName={fallback} error={params.error}/></div><p className="mt-5 text-center text-xs leading-5 text-black/40">Your answers stay private and can be changed later from Profile.</p></div></main>;
 }
