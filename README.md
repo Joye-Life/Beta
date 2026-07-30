@@ -1,4 +1,4 @@
-# Joye Life v3.2.2 — Closed Beta
+# Joye Life v3.2.5 — Closed Beta
 
 Joye Life is an invite-only personal planning application built with Next.js, Supabase, and Vercel.
 
@@ -13,11 +13,13 @@ Joye Life is an invite-only personal planning application built with Next.js, Su
 - Contextual Ask Joye, editable Memory, and Journey history
 - Founding Beta status, legal starter pages, and mobile-ready navigation
 
-## v3.2.2 coaching safeguards
+## v3.2.5 brand and guided conversation experience
 
-Guided mode now recognizes common planning topics including fitness, protein and nutrition structure, meal prep, sleep routines, stress, home preparation, money, career, goals, and weekly planning. It no longer substitutes an unrelated goal when it cannot find a real topic match.
+The supplied Joye Life logo is now used throughout the landing page, dashboard, mobile navigation, browser metadata, home-screen icons, and social previews. The app-wide palette now follows the logo’s purple, blue, cyan, and mint gradient over a deep navy foundation.
 
-Optional live AI now has server-enforced daily, monthly, and per-minute limits. When AI is disabled, unavailable, or over quota, Joye switches to guided planning.
+Guided mode recognizes common planning topics including fitness, protein and nutrition structure, meal prep, sleep routines, stress, home preparation, money, career, goals, and weekly planning. It carries recent answers forward inside the current conversation and uses stated targets and preferences instead of repeating the opening response.
+
+Optional live AI has server-enforced daily, monthly, and per-minute limits. When AI is disabled, unavailable, or over quota, Joye switches to guided planning.
 
 ## Deploy
 
@@ -27,4 +29,4 @@ Optional live AI now has server-enforced daily, monthly, and per-minute limits. 
 4. Confirm Vercel variables from `.env.example`.
 5. Complete `LAUNCH-CHECKLIST.md` before inviting testers.
 
-See `AI-BETA-SETUP.md` for guided-only and limited-AI configurations.
+See `AI-BETA-SETUP.md` for guided-only and limited-AI configurations, and `BRAND-ASSETS.md` for the new logo files and palette.

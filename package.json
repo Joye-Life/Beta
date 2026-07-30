@@ -1,6 +1,6 @@
 {
   "name": "joye-life-v3",
-  "version": "3.2.3",
+  "version": "3.2.5",
   "private": true,
   "scripts": {
     "dev": "next dev",
