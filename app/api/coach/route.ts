@@ -38,13 +38,18 @@ export async function POST(request: Request) {
     conversationId = conversation.id;
   }
 
-  await supabase.from("joye_messages").insert({ user_id: user.id, conversation_id: conversationId, role: "user", content: message });
+  if (!conversationId) {
+    return NextResponse.json({ error: "Joye could not start the conversation." }, { status: 500 });
+  }
+  const activeConversationId: string = conversationId;
+
+  await supabase.from("joye_messages").insert({ user_id: user.id, conversation_id: activeConversationId, role: "user", content: message });
   const fallbackName = user.user_metadata?.display_name || user.email?.split("@")[0] || "Member";
   const context = await loadJoyeContext(supabase, user.id, fallbackName);
 
   const { data: history } = await supabase.from("joye_messages")
     .select("role,content")
-    .eq("conversation_id", conversationId)
+    .eq("conversation_id", activeConversationId)
     .eq("user_id", user.id)
     .order("created_at", { ascending: true })
     .limit(14);
@@ -59,7 +64,7 @@ export async function POST(request: Request) {
   let provider: Provider = "guided";
   let requestId: string | null = null;
   const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
-  const reservation = await reserveAiUsage(user.id, conversationId, model);
+  const reservation = await reserveAiUsage(user.id, activeConversationId, model);
 
   if (reservation.enabled && !reservation.available) {
     provider = reservation.reason === "daily_limit" || reservation.reason === "monthly_limit" || reservation.reason === "minute_limit"
@@ -118,12 +123,12 @@ export async function POST(request: Request) {
 
   await supabase.from("joye_messages").insert({
     user_id: user.id,
-    conversation_id: conversationId,
+    conversation_id: activeConversationId,
     role: "assistant",
     content: answer,
     metadata: { provider, section, request_id: requestId },
   });
-  await supabase.from("joye_conversations").update({ updated_at: new Date().toISOString() }).eq("id", conversationId).eq("user_id", user.id);
+  await supabase.from("joye_conversations").update({ updated_at: new Date().toISOString() }).eq("id", activeConversationId).eq("user_id", user.id);
 
   const rememberMatch = message.match(/^remember(?: that)?[:\s]+(.+)/i);
   if (rememberMatch?.[1]) {
@@ -138,7 +143,7 @@ export async function POST(request: Request) {
   }
 
   const usage = await getAiUsageSnapshot(user.id);
-  return NextResponse.json({ answer, provider, conversationId, usage });
+  return NextResponse.json({ answer, provider, conversationId: activeConversationId, usage });
 }
 
 function instructions(section: CoachSection, style: string) {
